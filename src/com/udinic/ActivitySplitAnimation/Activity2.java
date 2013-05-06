@@ -1,7 +1,13 @@
 package com.udinic.ActivitySplitAnimation;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.PixelFormat;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.WindowManager;
+
+import android.widget.ImageView;
 import com.udinic.ActivitySplitAnimation.utils.ActivitySplitAnimationUtil;
 
 public class Activity2 extends Activity {
@@ -11,12 +17,27 @@ public class Activity2 extends Activity {
         super.onCreate(savedInstanceState);
 
         // Preparing the 2 images to be split
-        ActivitySplitAnimationUtil.prepareAnimation(this);
+        int cutSize = 120;
+        Bitmap bm = ActivitySplitAnimationUtil.prepareAnimation(this, cutSize);   
+        
+//        ImageView imageView = new ImageView(this);
+//        imageView.setImageBitmap(bm);
+//
+//        WindowManager.LayoutParams windowParams = new WindowManager.LayoutParams();
+//        windowParams.gravity = Gravity.TOP;
+//        windowParams.x = 0;
+//        windowParams.y = loc[2] + loc[0];
+//        windowParams.height = loc[1] - loc[0];
+//        windowParams.width = bmp.getWidth();
+//        windowParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+//        windowParams.format = PixelFormat.TRANSLUCENT;
+//        windowParams.windowAnimations = 0;
+//        destActivity.getWindowManager().addView(imageView, windowParams);
 
         setContentView(R.layout.act_two);
 
         // Animating the items to be open, revealing the new activity
-        ActivitySplitAnimationUtil.animate(this, 1000);
+        ActivitySplitAnimationUtil.animate(this, 3000);
     }
 
     @Override

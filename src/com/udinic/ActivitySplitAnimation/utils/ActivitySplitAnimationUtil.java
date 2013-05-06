@@ -69,7 +69,21 @@ public class ActivitySplitAnimationUtil {
      */
     public static void prepareAnimation(final Activity destActivity) {
         mTopImage = createImageView(destActivity, mBitmap, mLoc1);
-        mBottomImage = createImageView(destActivity, mBitmap, mLoc2);
+        mBottomImage = createImageView(destActivity, mBitmap, mLoc2);        
+    }
+    
+    /**
+     * Preparing the graphics on the destination Activity while creating a third image view to animate.
+     * Should be called on the destination activity on Activity#onCreate() BEFORE setContentView()
+     *
+     * @param destActivity the destination Activity
+     */
+    public static Bitmap prepareAnimation(final Activity destActivity, int imageSize) {
+    	mLoc1[1] -= imageSize / 2;
+    	mLoc2[0] += imageSize / 2;
+    	prepareAnimation(destActivity);
+        
+        return Bitmap.createBitmap(mBitmap, 0, mLoc1[1], mBitmap.getWidth(), mLoc2[0] - mLoc1[1]);        
     }
 
     /**
