@@ -40,12 +40,13 @@ public class ActivitySplitAnimationUtil {
      *
      * @param currActivity The current Activity
      * @param intent       The Intent needed tot start the new Activity
-     * @param splitYCoord  The Y coordinate where we want to split the Activity on the animation. -1 will split the Activity equally
+     * @param y1           The top Y coordinate where we want to split the Activity on the animation. -1 will split the Activity equally
+     * @param y2           The bottom Y coordinate where we want to split the Activity on the animation. -1 will split the Activity equally
      */
-    public static void startActivity(Activity currActivity, Intent intent, int splitYCoord) {
+    public static void startActivity(Activity currActivity, Intent intent, int y1, int y2) {
 
         // Preparing the bitmaps that we need to show
-        prepare(currActivity, splitYCoord);
+        prepare(currActivity, y1, y2);
 
         currActivity.startActivity(intent);
         currActivity.overridePendingTransition(0, 0);
@@ -58,7 +59,7 @@ public class ActivitySplitAnimationUtil {
      * @param intent       The Intent needed tot start the new Activity
      */
     public static void startActivity(Activity currActivity, Intent intent) {
-        startActivity(currActivity, intent, -1);
+        startActivity(currActivity, intent, -1, -1);
     }
 
     /**
@@ -69,21 +70,17 @@ public class ActivitySplitAnimationUtil {
      */
     public static void prepareAnimation(final Activity destActivity) {
         mTopImage = createImageView(destActivity, mBitmap, mLoc1);
-        mBottomImage = createImageView(destActivity, mBitmap, mLoc2);        
+        mBottomImage = createImageView(destActivity, mBitmap, mLoc2);
     }
-    
-    /**
-     * Preparing the graphics on the destination Activity while creating a third image view to animate.
-     * Should be called on the destination activity on Activity#onCreate() BEFORE setContentView()
-     *
-     * @param destActivity the destination Activity
-     */
-    public static Bitmap prepareAnimation(final Activity destActivity, int imageSize) {
-    	mLoc1[1] -= imageSize / 2;
-    	mLoc2[0] += imageSize / 2;
-    	prepareAnimation(destActivity);
-        
-        return Bitmap.createBitmap(mBitmap, 0, mLoc1[1], mBitmap.getWidth(), mLoc2[0] - mLoc1[1]);        
+
+    public static int getSplitY1()
+    {
+        return mLoc1[1];
+    }
+
+    public static int getSplitY2()
+    {
+        return mLoc2[0];
     }
 
     /**
@@ -189,9 +186,10 @@ public class ActivitySplitAnimationUtil {
      * Preparing the graphics for the animation
      *
      * @param currActivity the current Activity from where we start the new one
-     * @param splitYCoord  The Y coordinate where we want to split the activity. -1 will split the activity equally
+     * @param y1           The top Y coordinate where we want to split the Activity on the animation. -1 will split the Activity equally
+     * @param y2           The bottom Y coordinate where we want to split the Activity on the animation. -1 will split the Activity equally
      */
-    private static void prepare(Activity currActivity, int splitYCoord) {
+    private static void prepare(Activity currActivity, int y1, int y2) {
 
         // Get the content of the activity and put in a bitmap
         View root = currActivity.getWindow().getDecorView().findViewById(android.R.id.content);
@@ -199,14 +197,27 @@ public class ActivitySplitAnimationUtil {
         mBitmap = root.getDrawingCache();
 
         // If the split Y coordinate is -1 - We'll split the activity equally
-        splitYCoord = (splitYCoord != -1 ? splitYCoord : mBitmap.getHeight() / 2);
+        y1 = (y1 != -1 ? y1 : mBitmap.getHeight() / 2);
+        y2 = (y2 != -1 ? y2 : mBitmap.getHeight() / 2);
 
-        if (splitYCoord > mBitmap.getHeight())
-            throw new IllegalArgumentException("Split Y coordinate [" + splitYCoord + "] exceeds the activity's height [" + mBitmap.getHeight() + "]");
+        if (y1 > mBitmap.getHeight())
+        {
+            throw new IllegalArgumentException("Split Y coordinate [" + y1 + "] exceeds the activity's height [" + mBitmap.getHeight() + "]");
+        }
+        if (y2 > mBitmap.getHeight())
+        {
+            throw new IllegalArgumentException("Split Y coordinate [" + y2 + "] exceeds the activity's height [" + mBitmap.getHeight() + "]");
+        }
+        if (y1 > y2)
+        {
+            int temp = y1;
+            y1 = y2;
+            y2 = y1;
+        }
 
         // Set the location to put the 2 bitmaps on the destination activity
-        mLoc1 = new int[]{0, splitYCoord, root.getTop()};
-        mLoc2 = new int[]{splitYCoord, mBitmap.getHeight(), root.getTop()};
+        mLoc1 = new int[]{0, y1, root.getTop()};
+        mLoc2 = new int[]{y2, mBitmap.getHeight(), root.getTop()};
     }
 
     /**
@@ -256,8 +267,8 @@ public class ActivitySplitAnimationUtil {
 	     * Setting the bitmap offests to control the visible area
 	     *
 	     * @param width		   The bitmap image
-	     * @param bmp          The start Y position
-	     * @param loc          The end Y position
+	     * @param startY          The start Y position
+	     * @param endY          The end Y position
 	     * @return
 	     */
 		public void setImageOffsets(int width, int startY, int endY)

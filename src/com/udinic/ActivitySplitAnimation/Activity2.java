@@ -18,7 +18,7 @@ public class Activity2 extends Activity {
 
         // Preparing the 2 images to be split
         int cutSize = 120;
-        Bitmap bm = ActivitySplitAnimationUtil.prepareAnimation(this, cutSize);   
+        ActivitySplitAnimationUtil.prepareAnimation(this);
         
 //        ImageView imageView = new ImageView(this);
 //        imageView.setImageBitmap(bm);
